@@ -1,0 +1,39 @@
+timestamp,question,tools_used,latency_seconds,input_tokens,output_tokens,total_tokens,retrieved_evidence
+2026-10-29T00:02:08,What is the minimum attendance requirement?,search_student_handbook,2.35,982,159,1141,"1: ATTENDANCE
+Students should check their institution's official attendance policy to confirm the minimum attendance requirement. This sample handbook does not specify an official minimum percentage."
+2026-10-29T00:07:19,I attended 18 out of 22 classes. What is my attendance percentage?,calculate_attendance,2.03,972,69,1041,
+2026-10-29T00:09:08,What is the deadline for my Agentic AI assignment?,search_student_handbook,2.41,1016,259,1275,"2: ASSIGNMENTS
+Students should check the assignment instructions and course announcements for submission deadlines. If a deadline is unclear, contact the course instructor.
+
+5: COURSE INFORMATION
+Course schedules and assignment deadlines should be verified using official course announcements or the institution's learning management system."
+2026-10-29T00:13:08,What is the deadline for my Agentic AI assignment?,get_course_schedule,2.79,1048,90,1138,
+2026-10-29T00:15:04,What is the minimum attendance requirement?,search_student_handbook,2.95,1066,139,1205,"1: ATTENDANCE
+Students should check their institution's official attendance policy to confirm the minimum attendance requirement. This sample handbook does not specify an official minimum percentage."
+2026-10-29T00:16:20,"What programme am I studying, and what are my saved study preferences?",get_saved_memory,1.79,1069,144,1213,"{
+  ""preferred_name"": ""Student"",
+  ""programme"": ""PGDM Big Data Analytics"",
+  ""preferences"": [
+    ""Prefers simple explanations""
+  ]
+}"
+2026-10-29T00:18:31,Explain what an AI agent is in simple words.,None,2.93,502,180,682,
+2026-10-29T00:36:31,I attended 18 out of 22 classes. What is my attendance percentage?,calculate_attendance,1.74,1056,94,1150,
+2026-10-29T00:40:53,I attended 18 out of 22 classes. What is my attendance percentage?,calculate_attendance,1.58,1056,94,1150,
+2026-10-29T00:42:47,I attended 18 out of 22 classes. What is my attendance percentage?,calculate_attendance,2.36,1056,94,1150,
+2026-10-29T01:02:08,I attended 18 out of 22 classes. What is my attendance percentage?,calculate_attendance,1.8,1056,94,1150,
+2026-10-29T01:03:26,what is course deadline ?,None,1.84,497,142,639,
+2026-10-29T01:04:08,What is the deadline for my Agentic AI assignment?,get_course_schedule,2.17,1048,90,1138,
+2026-10-29T01:04:53,What is the minimum attendance requirement?,search_student_handbook,2.78,1066,139,1205,"1: ATTENDANCE
+Students should check their institution's official attendance policy to confirm the minimum attendance requirement. This sample handbook does not specify an official minimum percentage."
+2026-10-29T01:05:36,"What programme am I studying, and what are my saved study preferences?",get_saved_memory,3.45,1069,145,1214,"{
+  ""preferred_name"": ""Student"",
+  ""programme"": ""PGDM Big Data Analytics"",
+  ""preferences"": [
+    ""Prefers simple explanations""
+  ]
+}"
+2026-10-29T01:06:17,Explain what an AI agent is in simple words.,None,2.01,502,179,681,
+2026-10-29T01:12:17,Explain what an AI agent is in simple words.,None,1.08,502,180,682,
+2026-10-29T01:15:19,Explain what an AI agent is in simple words.,None,2.01,502,179,681,
+2026-10-29T01:16:20,What is the deadline for my Agentic AI assignment?,get_course_schedule,3.64,1048,90,1138,
