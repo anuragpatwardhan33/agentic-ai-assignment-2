@@ -5,7 +5,7 @@ from pathlib import Path
 
 app_path = Path(__file__).with_name("app.py")
 source = app_path.read_text(encoding="utf-8")
-prefix = source.split("# AGENT LOOP", 1)[0]
+prefix = source.split("# TOOL REGISTRY", 1)[0]
 
 with tempfile.TemporaryDirectory() as temp_dir:
     temp_path = Path(temp_dir)

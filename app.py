@@ -274,6 +274,25 @@ def save_memory(memory):
 
 
 def remember_preference(preferred_name="", programme="", preference=""):
+    # Block common sensitive information from persistent memory
+    sensitive_terms = (
+        "otp",
+        "one-time password",
+        "password",
+        "passcode",
+        "pin number",
+        "secret key",
+    )
+
+    for value in (preferred_name, programme, preference):
+        text = str(value).lower()
+
+        if any(term in text for term in sensitive_terms):
+            return (
+                "Memory not saved: sensitive information "
+                "such as passwords and OTPs cannot be stored."
+            )
+
     memory = load_memory()
 
     if preferred_name:
@@ -288,16 +307,6 @@ def remember_preference(preferred_name="", programme="", preference=""):
     save_memory(memory)
 
     return "Useful, non-sensitive information saved to persistent memory."
-
-
-def get_saved_memory():
-    memory = load_memory()
-
-    if not memory["preferred_name"] and not memory["programme"] and not memory["preferences"]:
-        return "No saved information yet."
-
-    return json.dumps(memory, indent=2, ensure_ascii=False)
-
 
 
 # -------------------------------

@@ -6,7 +6,7 @@ app_path = Path(__file__).with_name("app.py")
 source = app_path.read_text(encoding="utf-8")
 
 # Load definitions without starting the agent loop
-prefix = source.split("# AGENT LOOP", 1)[0]
+prefix = source.split("# TOOL REGISTRY", 1)[0]
 namespace = {"__file__": str(app_path)}
 
 exec(compile(prefix, str(app_path), "exec"), namespace)
