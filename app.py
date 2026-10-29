@@ -309,6 +309,18 @@ def remember_preference(preferred_name="", programme="", preference=""):
     return "Useful, non-sensitive information saved to persistent memory."
 
 
+def get_saved_memory():
+    memory = load_memory()
+
+    if (
+        not memory["preferred_name"]
+        and not memory["programme"]
+        and not memory["preferences"]
+    ):
+        return "No saved information yet."
+
+    return json.dumps(memory, indent=2, ensure_ascii=False)
+
 # -------------------------------
 # TOOL 1: COURSE SCHEDULE
 # -------------------------------
