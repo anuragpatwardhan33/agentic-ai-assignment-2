@@ -22,7 +22,215 @@ if not api_key:
 
 client = Groq(api_key=api_key)
 
+# ASSIGNMENT 2: STUDENT IDENTITY
+STUDENT_RECORDS_PATH = Path(__file__).parent / "data" / "student_records.json"
+
+# Demo identity for testing
+LOGGED_IN_STUDENT_ID = "STU001"
+
 MODEL = "openai/gpt-oss-20b"
+
+# --------------------------------
+# PRIVACY AND ACCESS CONTROL
+# --------------------------------
+
+def load_student_records():
+    with STUDENT_RECORDS_PATH.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def check_student_access(requested_student_id):
+    if requested_student_id != LOGGED_IN_STUDENT_ID:
+        return False
+
+    records = load_student_records()
+
+    if requested_student_id not in records:
+        return False
+
+    return True
+
+def get_student_fee_status(student_id):
+    if not check_student_access(student_id):
+        return "Access denied: You can only view your own student record."
+
+    records = load_student_records()
+    student = records[student_id]
+
+    return f"Fee status: {student['fee_status']}"
+
+
+# --------------------------------
+# APPROVAL WORKFLOW
+# --------------------------------
+
+APPROVAL_PATH = Path(__file__).parent / "approval_requests.json"
+
+
+def load_approval_requests():
+    with APPROVAL_PATH.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def save_approval_requests(requests):
+    with APPROVAL_PATH.open("w", encoding="utf-8") as file:
+        json.dump(requests, file, indent=4, ensure_ascii=False)
+
+
+def request_scholarship_change(student_id, new_bank_details):
+    if not check_student_access(student_id):
+        return "Access denied: You can only request changes to your own record."
+
+    requests = load_approval_requests()
+
+    request_id = f"REQ{len(requests) + 1:03d}"
+
+    requests.append({
+        "request_id": request_id,
+        "student_id": student_id,
+        "action": "change_scholarship_bank_details",
+        "new_bank_details": new_bank_details,
+        "status": "pending"
+    })
+
+    save_approval_requests(requests)
+
+    return f"Request {request_id} created. Status: pending approval."
+
+
+def decide_approval(request_id, decision, reviewer_key):
+    # Verify the trusted reviewer's secret
+    expected_key = os.getenv("APPROVAL_REVIEWER_KEY")
+
+    if not expected_key or reviewer_key != expected_key:
+        write_audit_log(
+        student_id="unknown",
+        action="approval_attempt",
+        permission="denied",
+        approval_status="not_authorized",
+        result="not_executed"
+    )
+        return "Access denied: Reviewer authorization failed."
+
+    if decision not in ("approved", "rejected"):
+        return "Invalid decision."
+
+    requests = load_approval_requests()
+
+    for request in requests:
+        if request["request_id"] == request_id:
+            if request["status"] != "pending":
+                return "This request has already been decided."
+
+            request["status"] = decision
+            save_approval_requests(requests)
+
+            write_audit_log(
+                student_id=request["student_id"],
+                action=request["action"],
+                permission="allowed",
+                approval_status=decision,
+                result="not_executed"
+            )
+
+            if decision == "rejected":
+                return "Request rejected. No change was made."
+
+            return (
+                "Request approved. The change is authorized "
+                "but has not been executed yet."
+            )
+
+    return "Request not found."
+
+
+
+# --------------------------------
+# AUDIT LOGGING
+# --------------------------------
+
+AUDIT_LOG_PATH = Path(__file__).parent / "audit_log.json"
+
+
+def write_audit_log(
+    student_id,
+    action,
+    permission,
+    approval_status,
+    result
+):
+    if AUDIT_LOG_PATH.exists():
+        with AUDIT_LOG_PATH.open("r", encoding="utf-8") as file:
+            audit_records = json.load(file)
+    else:
+        audit_records = []
+
+    audit_records.append({
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "student_id": student_id,
+        "action": action,
+        "permission": permission,
+        "approval_status": approval_status,
+        "result": result
+    })
+
+    with AUDIT_LOG_PATH.open("w", encoding="utf-8") as file:
+        json.dump(audit_records, file, indent=4, ensure_ascii=False)
+
+
+# --------------------------------
+# APPROVED CHANGE EXECUTION
+# --------------------------------
+
+def execute_approved_change(request_id):
+    requests = load_approval_requests()
+
+    for request in requests:
+        if request["request_id"] == request_id:
+            if request["status"] != "approved":
+                write_audit_log(
+                    student_id=request["student_id"],
+                    action=request["action"],
+                    permission="denied",
+                    approval_status=request["status"],
+                    result="not_executed"
+                )
+                return "Execution denied: request is not approved."
+
+            if not request.get("new_bank_details"):
+                return "Execution failed: bank details are missing."
+
+
+            records = load_student_records()
+            student_id = request["student_id"]
+
+            if student_id not in records:
+                return "Execution failed: student record not found."
+
+            if request["action"] != "change_scholarship_bank_details":
+                return "Execution denied: unsupported action."
+
+            records[student_id]["scholarship_bank_details"] = (
+                request["new_bank_details"]
+            )
+
+            with STUDENT_RECORDS_PATH.open("w", encoding="utf-8") as file:
+                json.dump(records, file, indent=4, ensure_ascii=False)
+
+            request["status"] = "executed"
+            save_approval_requests(requests)
+
+            write_audit_log(
+                student_id=student_id,
+                action=request["action"],
+                permission="allowed",
+                approval_status="executed",
+                result="executed"
+            )
+
+            return "Approved change executed successfully."
+
+    return "Execution failed: request not found."
 
 
 # --------------------------------
@@ -167,7 +375,8 @@ available_tools = {
     "calculate_attendance": calculate_attendance,
     "search_student_handbook": search_student_handbook,
     "remember_preference": remember_preference,
-    "get_saved_memory": get_saved_memory
+    "get_saved_memory": get_saved_memory,
+    "get_student_fee_status": get_student_fee_status
 }
 
 
@@ -285,6 +494,28 @@ tools = [
                 "additionalProperties": False
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_student_fee_status",
+            "description": (
+                "Check the logged-in student's own fee status. "
+                "Use this tool when the student asks about their fee status. "
+                "Never request or retrieve another student's private record."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "student_id": {
+                        "type": "string",
+                        "description": "The student ID to check."
+                    }
+                },
+                "required": ["student_id"],
+                "additionalProperties": False
+            }
+        }
     }
 ]
 
@@ -307,7 +538,7 @@ messages = [
             "Save useful, non-sensitive information only when the student"
             "clearly asks you to remember it."
             "Never save sensitive information."
-            "If information is missing, explain that clearlyz"
+            "If information is missing, explain that clearly"
             "Use get_course_schedule for specific course deadlines"
             "and schedule questions. Use search_student_handbook for"
             "general academic policies and handbook questions."
@@ -342,7 +573,7 @@ for step in range(5):
         tool_choice="auto",
         temperature=0
     )
-    
+
 
     # Add token usage from this model call
     if response.usage:
@@ -381,7 +612,7 @@ for step in range(5):
             arguments = json.loads(call.function.arguments)
             result = available_tools[tool_name](**arguments)
 
-        
+
         except (ValueError, TypeError, json.JSONDecodeError) as error:
             result = f"Tool error: {error}"
 

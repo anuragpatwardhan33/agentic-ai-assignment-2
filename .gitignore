@@ -11,3 +11,18 @@ __pycache__/
 
 # Local data and logs
 *.log
+
+# Local environment and editor files
+.env.*
+!.env.example
+.vscode/
+
+# Private application data
+approval_requests.json
+audit_log.json
+memory.json
+data/student_records.json
+
+# Local evaluation output
+evaluation_log.csv
+evaluation_results.csv
