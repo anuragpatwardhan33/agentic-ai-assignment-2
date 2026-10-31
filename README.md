@@ -320,19 +320,19 @@ The final two fee-status examples can be used to demonstrate the difference betw
 - LLM requests require internet access and an available Groq model.
 - The tests verify the demonstrated scenarios, not every possible security failure.
 
-## 14. GitHub Submission Checklist
+## 14.Final Project Verification
 
 Before uploading the project:
 
-- [ ] Include the complete source code.
-- [ ] Include `README.md` and `requirements.txt`.
-- [ ] Include the test scripts.
-- [ ] Include the sample handbook and appropriate demonstration data.
-- [ ] Exclude `.env`, API keys, and reviewer secrets.
-- [ ] Exclude `.venv/` and unnecessary Python cache files.
-- [ ] Review JSON and CSV files for private or sensitive information.
-- [ ] Run the syntax checks and all three test scripts.
-- [ ] Confirm the README instructions match the actual project files.
+- Include the complete source code.
+- Include `README.md` and `requirements.txt`.
+- Include the test scripts.
+- Include the sample handbook and appropriate demonstration data.
+- Exclude `.env`, API keys, and reviewer secrets.
+- Exclude `.venv/` and unnecessary Python cache files.
+- Review JSON and CSV files for private or sensitive information.
+- Run the syntax checks and all three test scripts.
+- Confirm the README instructions match the actual project files.
 
 ## 15. Conclusion
 
