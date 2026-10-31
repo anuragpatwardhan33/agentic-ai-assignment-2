@@ -1,0 +1,16 @@
+[
+    {
+        "request_id": "REQ001",
+        "student_id": "STU001",
+        "action": "change_scholarship_bank_details",
+        "new_bank_details": "XXXX-9999",
+        "status": "approved"
+    },
+    {
+        "request_id": "REQ002",
+        "student_id": "STU001",
+        "action": "change_scholarship_bank_details",
+        "new_bank_details": "XXXX-2222",
+        "status": "rejected"
+    }
+]
